@@ -36,6 +36,10 @@ class Dashboard extends Component {
           [0],
           [0]
         ]
+      },
+      routerVersionPie: {
+        labels: [],
+        series: []
       }
     }
     this.updateDashboard()
@@ -69,18 +73,40 @@ class Dashboard extends Component {
           graphData.series[1].concat(currentDownSpeed)
         ]
       }
+      var dataPie = {
+        labels: [],
+        series: []
+      }
+      let routerVersions = jQuery(response).find('#netdbversions > tbody > tr').map((idx,value) => {
+        let routerVersion = jQuery(value).find('a').html()
+        let routerVersionCount = jQuery(value).find('td:nth-child(2)').html()
+        dataPie.labels.push(routerVersion)
+        dataPie.series.push(routerVersionCount)
+      })
+
+      dataPie.labels = dataPie.labels.filter(v => {
+        if (v == undefined) return false
+        return true
+      })
+      dataPie.series = dataPie.series.filter(v => {
+        if (v == undefined) return false
+        return true
+      })
+
       self.setState({
         bw3sec: currentSpeed,
         bw5min: jQuery(response).find('#sb_bandwidth > tbody > tr:nth-child(2) > td:nth-child(2)').html().replace('&nbsp;', ' '),
         bwtotal: jQuery(response).find('#sb_bandwidth > tbody > tr:nth-child(3) > td:nth-child(2)').html().replace('&nbsp;', ' '),
         lastupdate: new Date(),
-        graphData: currentSeries
+        graphData: currentSeries,
+        routerVersionPie: dataPie
       })
       console.log(currentSeries)
     })
   }
 
   render() {
+    console.log(this.state)
     return (
       <div className="content">
         <Grid fluid>
@@ -147,11 +173,14 @@ class Dashboard extends Component {
                     id="chartPreferences"
                     className="ct-chart ct-perfect-fourth"
                   >
-                    <ChartistGraph data={dataPie} type="Pie" />
+                    <ChartistGraph data={this.state.routerVersionPie} type="Pie" />
                   </div>
                 }
                 legend={
-                  <div className="legend">{this.createLegend(legendPie)}</div>
+                  <div className="legend">{this.createLegend({
+                    names: this.state.routerVersionPie.labels,
+                    types: ['info']
+                  })}</div>
                 }
               />
             </Col>
