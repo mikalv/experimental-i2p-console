@@ -478,7 +478,7 @@ var dataPie = {
   series: [40, 20, 40]
 };
 var legendPie = {
-  names: ["Open", "Bounce", "Unsubscribe"],
+  names: ["I2P (Java)", "I2Pd", "Unknown"],
   types: ["info", "danger", "warning"]
 };
 
@@ -502,7 +502,7 @@ var dataSales = {
 };
 var optionsSales = {
   low: 0,
-  high: 800,
+  high: 20,
   showArea: false,
   height: "245px",
   axisX: {
@@ -529,7 +529,7 @@ var responsiveSales = [
   ]
 ];
 var legendSales = {
-  names: ["Open", "Click", "Click Second Time"],
+  names: ["Up (KBps)", "Down (KBps)"],
   types: ["info", "danger", "warning"]
 };
 

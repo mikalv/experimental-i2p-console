@@ -39,7 +39,7 @@ class Sidebar extends Component {
         <div className="sidebar-background" style={sidebarBackground} />
         <div className="logo">
           <a
-            href="https://www.creative-tim.com"
+            href="https://geti2p.net"
             className="simple-text logo-mini"
           >
             <div className="logo-img">
@@ -47,10 +47,10 @@ class Sidebar extends Component {
             </div>
           </a>
           <a
-            href="https://www.creative-tim.com"
+            href="https://geti2p.net"
             className="simple-text logo-normal"
           >
-            Creative Tim
+            I2P Console v2.0
           </a>
         </div>
         <div className="sidebar-wrapper">

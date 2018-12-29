@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import ChartistGraph from "react-chartist";
 import { Grid, Row, Col } from "react-bootstrap";
+import jQuery from 'jquery';
+import moment from 'moment';
+import _ from 'lodash';
 
 import { Card } from "components/Card/Card.jsx";
 import { StatsCard } from "components/StatsCard/StatsCard.jsx";
@@ -19,6 +22,27 @@ import {
 } from "variables/Variables.jsx";
 
 class Dashboard extends Component {
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      bw3sec: '0',
+      bw5min: '0',
+      bwtotal: '0',
+      lastupdate: 0,
+      graphData: {
+        labels: ["last refresh"],
+        series: [
+          [0],
+          [0]
+        ]
+      }
+    }
+    this.updateDashboard()
+    this.updateDashboard = this.updateDashboard.bind(this)
+    setInterval(this.updateDashboard, 3000)
+  }
+
   createLegend(json) {
     var legend = [];
     for (var i = 0; i < json["names"].length; i++) {
@@ -29,45 +53,63 @@ class Dashboard extends Component {
     }
     return legend;
   }
+
+  updateDashboard() {
+    let self = this
+    jQuery.get('/netdb', function(response) {
+      let graphData = self.state.graphData
+      let currentSpeed = jQuery(response).find('#sb_bandwidth > tbody > tr:nth-child(1) > td:nth-child(2)').html().replace('&nbsp;', ' ')
+      let currentUpSpeed = parseFloat(currentSpeed.substring(0, currentSpeed.indexOf('/')))
+      let currentDownSpeed = parseFloat(currentSpeed.substring(currentSpeed.indexOf('/')+2, currentSpeed.indexOf('KBps')))
+      console.log(`Current up: ${currentUpSpeed} and down: ${currentDownSpeed}`)
+      let currentSeries = {
+        labels: [...graphData.labels, moment(new Date()).format('HH:mm:ss')],
+        series: [
+          graphData.series[0].concat(currentUpSpeed),
+          graphData.series[1].concat(currentDownSpeed)
+        ]
+      }
+      self.setState({
+        bw3sec: currentSpeed,
+        bw5min: jQuery(response).find('#sb_bandwidth > tbody > tr:nth-child(2) > td:nth-child(2)').html().replace('&nbsp;', ' '),
+        bwtotal: jQuery(response).find('#sb_bandwidth > tbody > tr:nth-child(3) > td:nth-child(2)').html().replace('&nbsp;', ' '),
+        lastupdate: new Date(),
+        graphData: currentSeries
+      })
+      console.log(currentSeries)
+    })
+  }
+
   render() {
     return (
       <div className="content">
         <Grid fluid>
           <Row>
-            <Col lg={3} sm={6}>
+            <Col lg={4} sm={6}>
               <StatsCard
-                bigIcon={<i className="pe-7s-server text-warning" />}
-                statsText="Capacity"
-                statsValue="105GB"
+                bigIcon={<i className="pe-7s-signal text-info" />}
+                statsText="3 Sec"
+                statsValue={this.state.bw3sec}
                 statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Updated now"
+                statsIconText={moment(this.state.lastupdate).fromNow()}
               />
             </Col>
-            <Col lg={3} sm={6}>
+            <Col lg={4} sm={6}>
               <StatsCard
-                bigIcon={<i className="pe-7s-wallet text-success" />}
-                statsText="Revenue"
-                statsValue="$1,345"
+                bigIcon={<i className="pe-7s-signal text-info" />}
+                statsText="5 Min"
+                statsValue={this.state.bw5min}
                 statsIcon={<i className="fa fa-calendar-o" />}
-                statsIconText="Last day"
+                statsIconText={moment(this.state.lastupdate).fromNow()}
               />
             </Col>
-            <Col lg={3} sm={6}>
+            <Col lg={4} sm={6}>
               <StatsCard
-                bigIcon={<i className="pe-7s-graph1 text-danger" />}
-                statsText="Errors"
-                statsValue="23"
+                bigIcon={<i className="pe-7s-signal text-info" />}
+                statsText="Total"
+                statsValue={this.state.bwtotal}
                 statsIcon={<i className="fa fa-clock-o" />}
-                statsIconText="In the last hour"
-              />
-            </Col>
-            <Col lg={3} sm={6}>
-              <StatsCard
-                bigIcon={<i className="fa fa-twitter text-info" />}
-                statsText="Followers"
-                statsValue="+45"
-                statsIcon={<i className="fa fa-refresh" />}
-                statsIconText="Updated now"
+                statsIconText={moment(this.state.lastupdate).fromNow()}
               />
             </Col>
           </Row>
@@ -76,13 +118,13 @@ class Dashboard extends Component {
               <Card
                 statsIcon="fa fa-history"
                 id="chartHours"
-                title="Users Behavior"
-                category="24 Hours performance"
+                title="Router Statistics"
+                category="Realtime performance"
                 stats="Updated 3 minutes ago"
                 content={
                   <div className="ct-chart">
                     <ChartistGraph
-                      data={dataSales}
+                      data={this.state.graphData}
                       type="Line"
                       options={optionsSales}
                       responsiveOptions={responsiveSales}
@@ -97,9 +139,9 @@ class Dashboard extends Component {
             <Col md={4}>
               <Card
                 statsIcon="fa fa-clock-o"
-                title="Email Statistics"
-                category="Last Campaign Performance"
-                stats="Campaign sent 2 days ago"
+                title="Router types"
+                category="Last Check Results"
+                stats="Result compiled 2 days ago"
                 content={
                   <div
                     id="chartPreferences"
@@ -119,7 +161,7 @@ class Dashboard extends Component {
             <Col md={6}>
               <Card
                 id="chartActivity"
-                title="2014 Sales"
+                title="Something else"
                 category="All products including Taxes"
                 stats="Data information certified"
                 statsIcon="fa fa-check"
