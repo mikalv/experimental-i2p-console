@@ -502,7 +502,7 @@ var dataSales = {
 };
 var optionsSales = {
   low: 0,
-  high: 20,
+  high: 300,
   showArea: false,
   height: "245px",
   axisX: {
@@ -529,7 +529,7 @@ var responsiveSales = [
   ]
 ];
 var legendSales = {
-  names: ["Up (KBps)", "Down (KBps)"],
+  names: ["Down (KBps)", "Up (KBps)"],
   types: ["info", "danger", "warning"]
 };
 
