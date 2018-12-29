@@ -1,5 +1,7 @@
 # I2P Experimental web console
 
+![Early Image](public/early-stage.png)
+
 ## To install / use
 
 ```
